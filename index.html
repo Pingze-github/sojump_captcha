@@ -1,0 +1,52 @@
+<html>
+    <head>
+        <title>验证码在线人工识别系统</title>
+        <style>
+        </style>
+    </head>
+    <body>
+        <div>
+            <span id="id"></span>
+        </div>
+        <div>
+            <img id="imgCode" />
+        </div>
+        <div>
+            <input id="code" type="text" />
+        </div>
+        <div>
+            <input id="button" type="submit" />
+        </div>
+        <div>
+            <input id="t" type="text" style="display:none;"/>
+        </div>
+        <script type="text/javascript" src="/js/jquery.min.js"></script>
+        <script type="text/javascript">
+            q = 11649210;
+            function showImgCode(){
+                var t = (new Date()).valueOf();
+                $("#t").attr("value",t.toString());
+                var src = "https://www.sojump.com/AntiSpamImageGen.aspx?q=" + q.toString() + "&t=" + t.toString();
+                $("#imgCode").attr("src",src);
+            }
+            $("#id").text("id: "+q.toString());
+            $("#button").click(function(){
+                var code = $('#code').val();
+                var t = $('#t').val();
+                $.post(
+                    '/post',
+                    {
+                        "q":q
+                        ,"t":t
+                        ,"code":code 
+                    },
+                    function(data,status){
+                        console.log(data);
+                        showImgCode();
+                    }
+                )
+            });
+            showImgCode();
+        </script>
+    </body>
+</html>
