@@ -4,6 +4,7 @@
 var express = require('express');
 var url = require('url');
 var bodyParser = require('body-parser');
+var storage = require('./lib/storage.js');
 
 /** SET **/
 var app = express();
@@ -30,7 +31,9 @@ app.get('/', function (req, res) { //主页
 app.post('/post', function (req, res) { //pipe
     console.log("[SERVER][GET] /post");
     console.log(req.body);
-    res.send("done");
+    storage.push(req.body,function(arg){
+        res.send(arg);
+    });
 });
 
 /**启动服务器**/
