@@ -4,13 +4,11 @@
 var express = require('express');
 var url = require('url');
 var bodyParser = require('body-parser');
-var storage = require('./lib/storage.js');
+var getCaptcha = require('./lib/getCaptcha.js');
 
 /** SET **/
 var app = express();
-app.use(bodyParser.urlencoded({    
-  extended: true
-}));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static('./src')); //add src files
 
 /**FUNCTION**/
@@ -28,12 +26,20 @@ app.get('/', function (req, res) { //主页
     res.sendHtml('index.html');
 });
 
+app.get('/img', function(req, res){
+    var params = url.parse(req.url,true).query;
+    console.log(params)
+    var q = params["q"];
+    var t = params["t"];
+    getCaptcha.get(q,t,function(img){
+        res.send(img);
+    })
+});
+
 app.post('/post', function (req, res) { //pipe
     console.log("[SERVER][GET] /post");
     console.log(req.body);
-    storage.push(req.body,function(arg){
-        res.send(arg);
-    });
+    res.send("done");
 });
 
 /**启动服务器**/

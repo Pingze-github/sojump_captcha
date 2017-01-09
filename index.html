@@ -16,7 +16,6 @@
         </div>
         <div>
             <input id="button" type="submit" />
-            <div id="status" style="opacity:0"></div>
         </div>
         <div>
             <input id="t" type="text" style="display:none;"/>
@@ -27,7 +26,7 @@
             function showImgCode(){
                 var t = (new Date()).valueOf();
                 $("#t").attr("value",t.toString());
-                var src = "https://www.sojump.hk/AntiSpamImageGen.aspx?q=" + q.toString() + "&t=" + t.toString();
+                var src = "http://localhost:9999/img?q=" + q.toString() + "&t=" + t.toString();
                 $("#imgCode").attr("src",src);
             }
             $("#id").text("id: "+q.toString());
@@ -42,21 +41,7 @@
                         ,"code":code 
                     },
                     function(data,status){
-                        if (data=='done'){ //成功
-                            $('#code').val("");
-                            $('#status').text("提交成功");
-                            $('#status').css("opacity","100");
-                            setTimeout(function(){
-                                $('#status').animate({opacity:"0"});
-                            },1000);
-                        }else{ //失败
-                            $('#code').val("");
-                            $('#status').text("提交失败");
-                            $('#status').css("opacity","100");
-                            setTimeout(function(){
-                                $('#status').animate({opacity:"0"});
-                            },1000);                           
-                        }
+                        console.log(data);
                         showImgCode();
                     }
                 )
