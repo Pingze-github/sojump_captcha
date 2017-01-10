@@ -9,42 +9,88 @@
             <span id="id"></span>
         </div>
         <div>
-            <img id="imgCode" />
+            <img id="imgCode" src="/img/loading.png" alt="loading" />
         </div>
         <div>
             <input id="code" type="text" />
         </div>
         <div>
             <input id="button" type="submit" />
+            <span id="report" style="display: none"></span>
         </div>
         <div>
             <input id="t" type="text" style="display:none;"/>
+            <input id="id" type="text" style="display:none;"/>
         </div>
         <script type="text/javascript" src="/js/jquery.min.js"></script>
+        <script type="text/javascript" src="/js/md5.js"></script>
         <script type="text/javascript">
-            q = 11649210;
+            function getQueryString (name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return decodeURIComponent(r[2]);    //(r[2]);
+                return "";
+            }
+            if (getQueryString("q").length == 8){
+                q = getQueryString("q");
+            }else{
+                q = "11649210"; //默认
+            }
+            $("span#id").text("id: "+q.toString()); //问卷id
             function showImgCode(){
+                $("#imgCode").attr("src","/img/loading.png"); //清空
+                var id = hex_md5(q+t+(new Date()).toJSON()); //验证码唯一id
+                $("input#id").attr("value",id.toString());
                 var t = (new Date()).valueOf();
                 $("#t").attr("value",t.toString());
-                var src = "http://localhost:9999/img?q=" + q.toString() + "&t=" + t.toString();
+                var src = "/img?q=" + q.toString() + "&t=" + t.toString() + "&id=" + id.toString();
                 $("#imgCode").attr("src",src);
             }
-            $("#id").text("id: "+q.toString());
             $("#button").click(function(){
+                var id = $('input#id').val();
                 var code = $('#code').val();
                 var t = $('#t').val();
-                $.post(
-                    '/post',
-                    {
-                        "q":q
-                        ,"t":t
-                        ,"code":code 
-                    },
-                    function(data,status){
-                        console.log(data);
-                        showImgCode();
+                if ($("#imgCode").width()==104 && $("#imgCode").height()==31){ //验证
+                    if (("%%"+code+"%%").match("%%[0-9a-zA-Z]{4}%%")!==null){
+                        $.post(
+                            '/post',
+                            {
+                                "id":id
+                                ,"q":q
+                                ,"t":t
+                                ,"code":code 
+                            },
+                            function(data,status){
+                                if (data == "saved"){
+                                    showImgCode();
+                                    $('#code').val("");
+                                    $('#report').text("提交成功");
+                                    $('#report').css("color","green");
+                                    $('#report').css("display","inline-block");
+                                    $('#report').fadeOut(1000);
+                                }else{
+                                    showImgCode();
+                                    $('#code').val("");
+                                    $('#report').text("提交失败");
+                                    $('#report').css("color","red");
+                                    $('#report').css("display","inline-block");
+                                    $('#report').fadeOut(1000);                                    
+                                }
+                            }
+                        )
+                    }else{
+                        $('#code').val("");
+                        $('#report').text("格式错误");
+                        $('#report').css("color","red");
+                        $('#report').css("display","inline-block");
+                        $('#report').fadeOut(1000);
                     }
-                )
+                }
+            });
+            $(document).keydown(function(e){
+                if(e.keyCode == "13") {
+                    $("#button").click();
+                }
             });
             showImgCode();
         </script>
